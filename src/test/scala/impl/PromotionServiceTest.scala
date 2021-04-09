@@ -70,6 +70,18 @@ class PromotionServiceTest extends AnyFlatSpec with Matchers with TableDrivenPro
 
   }
 
+
+  it must "consider max quantity when calculating promotions" in {
+    val promo = Promotion("buy 5 get 2 free", BaseCondition(1L, 5), Reward(1L, 2, PercentageDiscount(100)))
+    val basket = Map((0,1L), (1, 1L), (2, 1L),(3, 1L),(4, 1L),(5, 1L))
+    val rewards = PromotionService(Set(promo)).getRewardsForAllPromotions(basket)
+    rewards.size mustEqual 2
+    rewards.values.toList mustEqual List(
+      ("buy 5 get 2 free", PercentageDiscount(100)),
+      ("buy 5 get 2 free", PercentageDiscount(100))
+    )
+  }
+
   // unclear requirement to discuss
   it must "computePercentageDiscounts - multiple promotions matches the same product - no requirements provided" ignore {
     val promo = Set(
